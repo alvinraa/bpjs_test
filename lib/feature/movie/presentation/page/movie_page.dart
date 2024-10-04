@@ -1,10 +1,14 @@
 import 'package:bpjs_test/core/common/assets.dart';
+import 'package:bpjs_test/core/common/constant.dart';
 import 'package:bpjs_test/core/common/logger.dart';
 import 'package:bpjs_test/core/widget/appbar/default_appbar.dart';
 import 'package:bpjs_test/core/widget/shimmer/default_shimmer.dart';
+import 'package:bpjs_test/feature/movie/bloc/movie_list/movie_list_bloc.dart';
+import 'package:bpjs_test/feature/movie/data/model/movie_model.dart';
 import 'package:bpjs_test/feature/movie/presentation/widget/movie_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MoviePage extends StatefulWidget {
   final dynamic data;
@@ -16,11 +20,14 @@ class MoviePage extends StatefulWidget {
 
 class _MoviePageState extends State<MoviePage> {
   final _scrollController = ScrollController();
+  late MovieListBloc movieListBloc;
 
   @override
   void initState() {
     super.initState();
     // get data
+    movieListBloc = MovieListBloc();
+    movieListBloc.add(GetMovieListRequest());
   }
 
   bool _handleScrollNotification(ScrollNotification notification) {
@@ -29,7 +36,7 @@ class _MoviePageState extends State<MoviePage> {
         _scrollController.position.userScrollDirection ==
             ScrollDirection.reverse) {
       Logger.print('LOADMORE');
-      // load data again for pagination
+      movieListBloc.add(GetMovieListRequest(isLoadMore: true));
     }
     return false;
   }
@@ -70,10 +77,31 @@ class _MoviePageState extends State<MoviePage> {
   }
 
   buildContent(BuildContext context) {
+    return BlocConsumer(
+      bloc: movieListBloc,
+      listener: (context, state) {
+        // if needed only.
+      },
+      builder: (context, state) {
+        if (state is GetMovieListLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is GetMovieListError) {
+          return Center(child: Text(state.errorMessage ?? "-"));
+        }
+
+        return buildMovieList(context, state);
+      },
+    );
+  }
+
+  Widget buildMovieList(BuildContext context, Object? state) {
     return RefreshIndicator(
       onRefresh: () async {
         // get data again
         Logger.print('REFRESH');
+        movieListBloc.add(GetMovieListRequest());
       },
       child: NotificationListener(
         onNotification: (ScrollNotification notification) {
@@ -122,19 +150,22 @@ class _MoviePageState extends State<MoviePage> {
                 ),
                 child: const Divider(thickness: 4),
               ),
-              itemCount: 5,
+              itemCount: movieListBloc.listMovie.length,
               itemBuilder: (context, index) {
-                // var data = [];
+                MovieModel data = movieListBloc.listMovie[index];
 
                 return MovieItem(
                   index: index,
-                  // title: data.title ?? '-',
-                  // desc: data.description ?? '-',
-                  // date: data.createdDate,
-                  // imageUrl: data.poster ?? '-',
-                  // onTap: () {
-                  //   // goes to detail page
-                  // },
+                  title: data.title ?? '-',
+                  desc: data.overview ?? '-',
+                  date: data.releaseDate,
+                  imageUrl: '${Constant.baseImageUrl}${data.posterPath}',
+                  rate: data.voteAverage?.toStringAsFixed(1) ?? '-',
+                  popularity: data.popularity?.toStringAsFixed(0) ?? '-',
+                  language: data.originalLanguage?.toUpperCase() ?? '-',
+                  onTap: () {
+                    // goes to detail page
+                  },
                 );
               },
             ),

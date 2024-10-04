@@ -1,26 +1,33 @@
 import 'package:bpjs_test/core/common/assets.dart';
+import 'package:bpjs_test/core/common/helper.dart';
 import 'package:bpjs_test/core/theme/style.dart';
 import 'package:bpjs_test/core/widget/shimmer/default_shimmer.dart';
 import 'package:flutter/material.dart';
 
 class MovieItem extends StatefulWidget {
-  // final void Function()? onTap;
-  // final String imageUrl;
-  // final String title;
-  // final String desc;
-  // final DateTime? date;
+  final void Function()? onTap;
+  final String imageUrl;
+  final String title;
+  final String desc;
+  final String rate;
+  final String popularity;
+  final String language;
+  final DateTime? date;
   final bool isLoadmore;
   final int index;
 
   const MovieItem({
     super.key,
-    // this.onTap,
-    // required this.title,
-    // required this.desc,
-    // required this.date,
-    // required this.imageUrl,
+    this.onTap,
+    required this.title,
+    required this.desc,
+    required this.date,
+    required this.imageUrl,
     required this.index,
     this.isLoadmore = false,
+    required this.rate,
+    required this.popularity,
+    required this.language,
   });
 
   @override
@@ -46,7 +53,7 @@ class _MovieItemState extends State<MovieItem> {
                       child: Image.network(
                         width: 100,
                         height: 148,
-                        'https://image.tmdb.org/t/p/original/5ScPNT6fHtfYJeWBajZciPV3hEL.jpg',
+                        widget.imageUrl,
                         fit: BoxFit.cover,
                         alignment: Alignment.bottomCenter,
                         loadingBuilder: (context, child, loadingProgress) {
@@ -93,9 +100,9 @@ class _MovieItemState extends State<MovieItem> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Avatar: The Way of Water',
-                        style: TextStyle(
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),
@@ -112,7 +119,7 @@ class _MovieItemState extends State<MovieItem> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '14K',
+                                widget.popularity,
                                 style: TextStyle(
                                     fontSize: 10,
                                     color: Styles().color.onSecondaryContainer,
@@ -130,7 +137,7 @@ class _MovieItemState extends State<MovieItem> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '9/10',
+                                '${widget.rate}/10',
                                 style: TextStyle(
                                     fontSize: 10,
                                     color: Styles().color.onSecondaryContainer,
@@ -148,7 +155,7 @@ class _MovieItemState extends State<MovieItem> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'EN',
+                                widget.language,
                                 style: TextStyle(
                                     fontSize: 10,
                                     color: Styles().color.onSecondaryContainer,
@@ -157,11 +164,10 @@ class _MovieItemState extends State<MovieItem> {
                             ],
                           ),
                           const Expanded(child: SizedBox()),
-                          const Text(
-                            // Helper.formatDateTime(widget.date,
-                            //     format: 'dd MMM yyyy'),
-                            '14 Sept 2024',
-                            style: TextStyle(
+                          Text(
+                            Helper.formatDateTime(widget.date,
+                                format: 'dd MMM yyyy'),
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -169,11 +175,11 @@ class _MovieItemState extends State<MovieItem> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'The story takes place over a decade after the events of the first Avatar film, and follows Jake Sully, his wife Neytiri, and their five children as they travel from the jungle to an underwater paradise. When a threat returns to finish what was previously started, Jake must work with Neytiri and the Navi to protect their home',
+                      Text(
+                        widget.desc,
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                       ),
                     ],
                   ),
