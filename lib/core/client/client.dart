@@ -65,7 +65,7 @@ class Client {
   void setDioHeader() {
     dio.options.headers = {
       'accept': 'application/json',
-      'Authorization': Constant.authorization,
+      'Authorization': 'Bearer ${Constant.authorization}',
     };
   }
 
