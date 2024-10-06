@@ -1,6 +1,8 @@
 import 'package:bpjs_test/core/common/assets.dart';
 import 'package:bpjs_test/core/common/constant.dart';
 import 'package:bpjs_test/core/common/logger.dart';
+import 'package:bpjs_test/core/common/navigation.dart';
+import 'package:bpjs_test/core/common/routes.dart';
 import 'package:bpjs_test/core/widget/appbar/default_appbar.dart';
 import 'package:bpjs_test/core/widget/shimmer/default_shimmer.dart';
 import 'package:bpjs_test/feature/movie/bloc/movie_list/movie_list_bloc.dart';
@@ -45,7 +47,14 @@ class _MoviePageState extends State<MoviePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context),
-      body: buildContent(context),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // get data again
+          Logger.print('REFRESH');
+          movieListBloc.add(GetMovieListRequest());
+        },
+        child: buildContent(context),
+      ),
     );
   }
 
@@ -88,7 +97,10 @@ class _MoviePageState extends State<MoviePage> {
         }
 
         if (state is GetMovieListError) {
-          return Center(child: Text(state.errorMessage ?? "-"));
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(child: Text(state.errorMessage ?? "-")),
+          );
         }
 
         return buildMovieList(context, state);
@@ -97,80 +109,78 @@ class _MoviePageState extends State<MoviePage> {
   }
 
   Widget buildMovieList(BuildContext context, Object? state) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        // get data again
-        Logger.print('REFRESH');
-        movieListBloc.add(GetMovieListRequest());
+    return NotificationListener(
+      onNotification: (ScrollNotification notification) {
+        return _handleScrollNotification(notification);
       },
-      child: NotificationListener(
-        onNotification: (ScrollNotification notification) {
-          return _handleScrollNotification(notification);
-        },
-        child: ListView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            Image.network(
-              height: 200,
-              'https://image.tmdb.org/t/p/original/5ScPNT6fHtfYJeWBajZciPV3hEL.jpg',
-              fit: BoxFit.cover,
-              alignment: Alignment.bottomCenter,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                } else {
-                  return const DefaultShimmer(
-                    height: 200,
-                  );
-                }
-              },
-              errorBuilder: (context, url, error) => Image.asset(
-                Assets.placeholderWide,
-                fit: BoxFit.fill,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Popular Movies',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              separatorBuilder: (context, index) => Container(
-                margin: const EdgeInsets.only(
-                  bottom: 8,
-                  top: 8,
-                ),
-                child: const Divider(thickness: 4),
-              ),
-              itemCount: movieListBloc.listMovie.length,
-              itemBuilder: (context, index) {
-                MovieModel data = movieListBloc.listMovie[index];
-
-                return MovieItem(
-                  index: index,
-                  title: data.title ?? '-',
-                  desc: data.overview ?? '-',
-                  date: data.releaseDate,
-                  imageUrl: '${Constant.baseImageUrl}${data.posterPath}',
-                  rate: data.voteAverage?.toStringAsFixed(1) ?? '-',
-                  popularity: data.popularity?.toStringAsFixed(0) ?? '-',
-                  language: data.originalLanguage?.toUpperCase() ?? '-',
-                  onTap: () {
-                    // goes to detail page
-                  },
+      child: ListView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          Image.network(
+            height: 200,
+            'https://image.tmdb.org/t/p/original/5ScPNT6fHtfYJeWBajZciPV3hEL.jpg',
+            fit: BoxFit.cover,
+            alignment: Alignment.bottomCenter,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                return child;
+              } else {
+                return const DefaultShimmer(
+                  height: 200,
                 );
-              },
+              }
+            },
+            errorBuilder: (context, url, error) => Image.asset(
+              Assets.placeholderWide,
+              fit: BoxFit.fill,
             ),
-          ],
-        ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              'Popular Movies',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            separatorBuilder: (context, index) => Container(
+              margin: const EdgeInsets.only(
+                bottom: 8,
+                top: 8,
+              ),
+              child: const Divider(thickness: 4),
+            ),
+            itemCount: movieListBloc.listMovie.length,
+            itemBuilder: (context, index) {
+              MovieModel data = movieListBloc.listMovie[index];
+
+              return MovieItem(
+                index: index,
+                title: data.title ?? '-',
+                desc: data.overview ?? '-',
+                date: data.releaseDate,
+                imageUrl: '${Constant.baseImageUrl}${data.posterPath}',
+                rate: data.voteAverage?.toStringAsFixed(1) ?? '-',
+                popularity: data.popularity?.toStringAsFixed(0) ?? '-',
+                language: data.originalLanguage?.toUpperCase() ?? '-',
+                onTap: () {
+                  // goes to detail page
+                  Logger.print('ontap');
+                  navigatorKey.currentState?.pushNamed(
+                    Routes.movieDetailPage,
+                    arguments: data,
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
