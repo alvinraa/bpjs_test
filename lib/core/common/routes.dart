@@ -1,5 +1,6 @@
 import 'package:bpjs_test/feature/movie/presentation/page/movie_page.dart';
 import 'package:bpjs_test/feature/movie_detail/presentation/page/movie_detail_page.dart';
+import 'package:bpjs_test/feature/search/presentation/page/search_page.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -24,6 +25,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case Routes.movieDetailPage:
       return MaterialPageRoute(
         builder: (BuildContext context) => MovieDetailPage(
+          data: settings.arguments,
+        ),
+        settings: settings,
+      );
+    case Routes.searchPage:
+      return MaterialPageRoute(
+        builder: (BuildContext context) => SearchPage(
           data: settings.arguments,
         ),
         settings: settings,

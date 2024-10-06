@@ -71,6 +71,9 @@ class _MoviePageState extends State<MoviePage> {
           onTap: () {
             // goes to search page
             Logger.print('SEARCH');
+            navigatorKey.currentState?.pushNamed(
+              Routes.searchPage,
+            );
           },
           child: Container(
             margin: const EdgeInsets.fromLTRB(16, 0, 14, 0),
