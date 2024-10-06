@@ -4,11 +4,17 @@ import 'package:bpjs_test/core/common/logger.dart';
 import 'package:bpjs_test/feature/movie/data/model/moviedb_response.dart';
 import 'package:dio/dio.dart';
 
-class SearchRepository {
-  Dio dio = Client().dio;
+abstract class ISearchRepository {
+  Future<MovieDBResponse> searchMovie(
+      {required String keyword, required int page});
+}
+
+class SearchRepository implements ISearchRepository {
+  Dio client = Client().dio;
   late Response response;
 
   // get now playing
+  @override
   Future<MovieDBResponse> searchMovie(
       {required String keyword, required int page}) async {
     Logger.print('--- SearchRepository @searchMovie : ---');
@@ -19,7 +25,7 @@ class SearchRepository {
         "page": page,
       };
 
-      response = await dio.get(
+      response = await client.get(
         endPoint,
         queryParameters: param,
       );
