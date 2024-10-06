@@ -84,6 +84,26 @@ class _MoviePageState extends State<MoviePage> {
             ),
           ),
         ),
+        GestureDetector(
+          onTap: () async {
+            // goes to search page
+            Logger.print('REMOVE DATA FROM LOCAL STORAGE');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Remove local data that saved by HydratedBloc"),
+              ),
+            );
+            await movieListBloc.clear();
+          },
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(0, 0, 14, 0),
+            child: Icon(
+              Icons.delete_outlined,
+              color: Theme.of(context).colorScheme.primary,
+              size: 28,
+            ),
+          ),
+        ),
       ],
     );
   }
