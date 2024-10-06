@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class Helper {
@@ -13,5 +14,9 @@ class Helper {
     if (date == null) return "-";
     String formattedDate = DateFormat(format, "id_ID").format(date);
     return formattedDate;
+  }
+
+  static Future<void> copyToClipboard(String? text) async {
+    await Clipboard.setData(ClipboardData(text: text ?? ''));
   }
 }

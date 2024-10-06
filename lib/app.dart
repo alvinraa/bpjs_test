@@ -3,6 +3,7 @@ import 'package:bpjs_test/core/common/navigation.dart';
 import 'package:bpjs_test/core/common/routes.dart';
 import 'package:bpjs_test/core/theme/style.dart';
 import 'package:bpjs_test/feature/movie/bloc/movie_list/movie_list_bloc.dart';
+import 'package:bpjs_test/feature/search/bloc/search/search_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +32,7 @@ class AppState extends State<App> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => MovieListBloc()),
+        BlocProvider(create: (context) => SearchBloc()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

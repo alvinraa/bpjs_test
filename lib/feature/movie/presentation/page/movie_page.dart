@@ -183,6 +183,13 @@ class _MoviePageState extends State<MoviePage> {
               );
             },
           ),
+          // show for loadmore
+          Container(
+            margin: const EdgeInsets.only(top: 20, bottom: 20),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
         ],
       ),
     );
